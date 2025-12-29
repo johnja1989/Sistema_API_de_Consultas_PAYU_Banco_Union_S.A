@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema API de Consultas PAYU - Banco Unión S.A.</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #1a5276;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            background-image: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .logo-container:hover {
+            transform: translateY(-3px);
+        }
+        
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+        
+        .logo-placeholder {
+            font-size: 2.8rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            width: 60px;
+        }
+        
+        .header-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1 {
+            font-size: 1.9rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .environment-indicator {
+            background: rgb(255, 0, 0);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .environment-indicator.production {
+            background: rgb(3, 177, 75);
+            border-color: rgba(39, 174, 96, 0.3);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid #eaeaea;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card-title {
+            font-size: 1.35rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: var(--accent-color);
+            width: 24px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #fdfdfd;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            background-color: white;
+        }
+        
+        .config-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .config-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--accent-color), #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #2980b9, var(--accent-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, var(--success-color), #229954);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(to right, #229954, var(--success-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, var(--warning-color), #d68910);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(to right, #d68910, var(--warning-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger-color), #cb4335);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(to right, #cb4335, var(--danger-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .query-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 576px) {
+            .query-types {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .query-type-btn {
+            padding: 18px 10px;
+            background-color: white;
+            border: 2px solid #eaeaea;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .query-type-btn:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .query-type-btn.active {
+            background-color: #e8f4fc;
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.15);
+        }
+        
+        .query-type-btn i {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+        
+        .query-type-btn div {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .response-container {
+            position: relative;
+        }
+        
+        #responseOutput {
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #1e272e;
+            color: #dcdde1;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: 1px solid #34495e;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected {
+            background-color: var(--success-color);
+            box-shadow: 0 0 8px rgba(39, 174, 96, 0.5);
+        }
+        
+        .status-disconnected {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(to right, var(--success-color), #229954);
+            border-left: 4px solid #1e8449;
+        }
+        
+        .notification.error {
+            background: linear-gradient(to right, var(--danger-color), #cb4335);
+            border-left: 4px solid #b03a2e;
+        }
+        
+        .notification.info {
+            background: linear-gradient(to right, var(--accent-color), #2980b9);
+            border-left: 4px solid #1f618d;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .footer-logo {
+            height: 30px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading i {
+            font-size: 2.2rem;
+            color: var(--accent-color);
+            animation: spin 1.5s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        
+        .tab:hover {
+            color: var(--accent-color);
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            min-width: 180px;
+        }
+        
+        .info-value {
+            color: #555;
+        }
+        
+        /* Estilos para el resaltado de JSON */
+        .string { color: #2ecc71; }
+        .number { color: #e74c3c; }
+        .boolean { color: #3498db; }
+        .null { color: #f39c12; }
+        .key { color: #9b59b6; }
+        
+        /* Responsividad adicional */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .environment-indicator {
+                align-self: flex-end;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Estilo para el logo del banco */
+        .bank-logo {
+            font-family: 'Georgia', serif;
+            font-weight: bold;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+        
+        /* Efecto de marca de agua */
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.05;
+            font-size: 8rem;
+            color: var(--primary-color);
+            z-index: -1;
+            pointer-events: none;
+            transform: rotate(-15deg);
+        }
+        
+        /* Nuevos estilos para configuración avanzada */
+        .proxy-config {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .proxy-config h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .proxy-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        .advanced-config {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .debug-info {
+            background-color: #e8f4f8;
+            border: 1px solid #bce8f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #31708f;
+        }
+        
+        .proxy-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .proxy-status.active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .proxy-status.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .content-type-fix {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .curl-example {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .credentials-check {
+            background-color: #fef9e7;
+            border: 1px solid #f7dc6f;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .credentials-check h4 {
+            color: #d68910;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .separate-credentials {
+            background-color: #f2f4f4;
+            border: 1px solid #d5dbdb;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .separate-credentials h5 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-credentials {
+            background-color: #f4ecf7;
+            border: 1px solid #d7bde2;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .test-credentials h5 {
+            color: #7d3c98;
+            margin-bottom: 10px;
+        }
+        
+        .solution-steps {
+            background-color: #e8f8f5;
+            border: 1px solid #a2d9ce;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .solution-steps h5 {
+            color: #148f77;
+            margin-bottom: 10px;
+        }
+        
+        .solution-steps ol {
+            padding-left: 20px;
+        }
+        
+        .solution-steps li {
+            margin-bottom: 8px;
+        }
+        
+        .api-response-example {
+            background-color: #1c2833;
+            color: #d5dbdb;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .credentials-note {
+            background-color: #e8f6f3;
+            border: 1px solid #a3e4d7;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #148f77;
+        }
+        
+        .warning-box {
+            background-color: #fef5e7;
+            border: 1px solid #fad7a0;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .warning-box h5 {
+            color: #d68910;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">
+        <i class="fas fa-university"></i>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <div class="logo-container">
+                    <img src="LOGO.png" alt="Banco Unión S.A." class="logo">
+                </div>
+                <div class="header-text">
+                    <h1><span class="bank-logo">BANCO UNIÓN S.A.</span></h1>
+                    <div class="subtitle">Sistema de Conexión al API de Consultas PAYU - Vicepresidencia de Tecnología</div>
+                </div>
+            </div>
+            <div class="environment-indicator" id="environmentIndicator">QA / PRUEBAS</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-column">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-cogs"></i> Configuración de Conexión</h2>
+                    
+                    <div class="tabs">
+                        <div class="tab active" data-tab="config-tab">Configuración</div>
+                        <div class="tab" data-tab="test-tab">Prueba de Conexión</div>
+                        <div class="tab" data-tab="proxy-tab">Configuración Avanzada</div>
+                        <div class="tab" data-tab="credentials-tab">Credenciales PAYU</div>
+                    </div>
+                    
+                    <div id="config-tab" class="tab-content active">
+                        <div class="separate-credentials">
+                            <h5><i class="fas fa-key"></i> Configuración de Credenciales</h5>
+                            
+                            <div class="warning-box">
+                                <h5><i class="fas fa-exclamation-triangle"></i> ¡ATENCIÓN!</h5>
+                                <p>PayU <strong>SIEMPRE</strong> tiene credenciales API <strong>DIFERENTES</strong> para QA y Producción.</p>
+                                <p>Si recibes "Invalid credentials" en Producción, necesitas las credenciales correctas del dashboard de Producción.</p>
+                            </div>
+                            
+                            <h5 style="margin-top: 20px; margin-bottom: 15px;"><i class="fas fa-universal-access"></i> Credenciales de API por Ambiente</h5>
+                            
+                            <div class="config-section">
+                                <div class="form-group">
+                                    <label for="apiLoginQA"><i class="fas fa-user-circle"></i> API Login (QA)</label>
+                                    <input type="text" id="apiLoginQA" placeholder="Ej: pRRXK018ikMmt9u">
+                                    <small style="color: #7f8c8d; font-size: 0.85rem;">Del dashboard de QA/Sandbox</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="apiKeyQA"><i class="fas fa-key"></i> API Key (QA)</label>
+                                    <input type="password" id="apiKeyQA" placeholder="Ej: 4Vj8ek4n1old272148hsramUA">
+                                    <div style="margin-top: 5px;">
+                                        <input type="checkbox" id="showApiKeyQA"> <label for="showApiKeyQA" style="display: inline; font-weight: normal; font-size: 0.85rem;">Mostrar API Key</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="apiLoginProd"><i class="fas fa-user-circle"></i> API Login (Producción)</label>
+                                    <input type="text" id="apiLoginProd" placeholder="Ej: ProdLogin12345">
+                                    <small style="color: #7f8c8d; font-size: 0.85rem;">Del dashboard de Producción</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="apiKeyProd"><i class="fas fa-key"></i> API Key (Producción)</label>
+                                    <input type="password" id="apiKeyProd" placeholder="Ej: ProdKey67890abc">
+                                    <div style="margin-top: 5px;">
+                                        <input type="checkbox" id="showApiKeyProd"> <label for="showApiKeyProd" style="display: inline; font-weight: normal; font-size: 0.85rem;">Mostrar API Key</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5 style="margin-top: 20px; margin-bottom: 15px;"><i class="fas fa-server"></i> Configuración de Comercio por Ambiente</h5>
+                            
+                            <div class="config-section">
+                                <div class="form-group">
+                                    <label for="merchantIdQA"><i class="fas fa-store"></i> Merchant ID (QA)</label>
+                                    <input type="text" id="merchantIdQA" placeholder="Ej: 508029">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="accountIdQA"><i class="fas fa-id-card"></i> Account ID (QA)</label>
+                                    <input type="text" id="accountIdQA" placeholder="Ej: 512321">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="merchantIdProd"><i class="fas fa-store"></i> Merchant ID (Producción)</label>
+                                    <input type="text" id="merchantIdProd" placeholder="Ej: 508030">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="accountIdProd"><i class="fas fa-id-card"></i> Account ID (Producción)</label>
+                                    <input type="text" id="accountIdProd" placeholder="Ej: 512322">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="environment"><i class="fas fa-server"></i> Ambiente Actual</label>
+                            <select id="environment">
+                                <option value="qa">QA / Pruebas (Sandbox)</option>
+                                <option value="production">Producción</option>
+                            </select>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-primary btn-block" id="saveConfig">
+                                <i class="fas fa-save"></i> Guardar Configuración
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="test-tab" class="tab-content">
+                        <div class="form-group">
+                            <p>Prueba la conexión con el API de PAYU utilizando el método Ping.</p>
+                            <div class="info-item">
+                                <div class="info-label">Estado actual:</div>
+                                <div class="info-value"><span id="connectionStatus"><span class="status-indicator status-disconnected"></span> Desconectado</span></div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">Ambiente probado:</div>
+                                <div class="info-value" id="testedEnvironment">Ninguno</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">Último error:</div>
+                                <div class="info-value" id="lastError">Ninguno</div>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-success" id="testConnection">
+                                <i class="fas fa-plug"></i> Probar Conexión Actual
+                            </button>
+                            <button class="btn btn-warning" id="testBothEnvironments">
+                                <i class="fas fa-vials"></i> Probar Ambos Ambientes
+                            </button>
+                        </div>
+                        
+                        <div class="loading" id="connectionLoading">
+                            <i class="fas fa-spinner"></i>
+                            <p id="loadingMessage">Probando conexión con PAYU...</p>
+                        </div>
+                        
+                        <div class="test-credentials">
+                            <h5><i class="fas fa-vial"></i> Prueba Rápida con Credenciales</h5>
+                            <p style="margin-bottom: 15px; color: #5d6d7e;">Prueba credenciales específicas sin guardar la configuración:</p>
+                            
+                            <div class="config-section">
+                                <div class="form-group">
+                                    <label for="testApiLogin"><i class="fas fa-user-circle"></i> API Login</label>
+                                    <input type="text" id="testApiLogin" placeholder="Ingresa API Login para probar">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="testApiKey"><i class="fas fa-key"></i> API Key</label>
+                                    <input type="password" id="testApiKey" placeholder="Ingresa API Key para probar">
+                                    <div style="margin-top: 5px;">
+                                        <input type="checkbox" id="showTestApiKey"> <label for="showTestApiKey" style="display: inline; font-weight: normal; font-size: 0.85rem;">Mostrar API Key</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="config-section">
+                                <div class="form-group">
+                                    <label for="testMerchantId"><i class="fas fa-store"></i> Merchant ID</label>
+                                    <input type="text" id="testMerchantId" placeholder="Ingresa Merchant ID para probar">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="testAccountId"><i class="fas fa-id-card"></i> Account ID</label>
+                                    <input type="text" id="testAccountId" placeholder="Ingresa Account ID para probar">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="testEnvironment"><i class="fas fa-server"></i> Ambiente de Prueba</label>
+                                <select id="testEnvironment">
+                                    <option value="qa">QA / Pruebas</option>
+                                    <option value="production">Producción</option>
+                                </select>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-info" id="testSpecificCredentials">
+                                    <i class="fas fa-flask"></i> Probar Credenciales Específicas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="proxy-tab" class="tab-content">
+                        <div class="proxy-config">
+                            <h4><i class="fas fa-server"></i> Configuración de Proxy</h4>
+                            
+                            <div class="proxy-toggle">
+                                <label class="switch">
+                                    <input type="checkbox" id="enableProxy">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span id="proxyStatusText">Proxy deshabilitado</span>
+                            </div>
+                            
+                            <div id="proxySettings" style="display: none;">
+                                <div class="form-group">
+                                    <label for="proxyUrl"><i class="fas fa-link"></i> URL del Proxy</label>
+                                    <input type="text" id="proxyUrl" placeholder="https://tu-proxy.com/api/proxy">
+                                    <small style="color: #7f8c8d; font-size: 0.9rem;">Deja en blanco para usar servicios proxy públicos alternativos</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="proxyTimeout"><i class="fas fa-clock"></i> Timeout (segundos)</label>
+                                    <input type="number" id="proxyTimeout" min="5" max="60" value="30">
+                                </div>
+                                
+                                <div class="advanced-config">
+                                    <h5><i class="fas fa-tools"></i> Configuración Avanzada</h5>
+                                    <div class="form-group">
+                                        <input type="checkbox" id="logRequests">
+                                        <label for="logRequests" style="display: inline; font-weight: normal;">Registrar todas las peticiones (debug)</label>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button class="btn btn-warning" id="testProxy">
+                                            <i class="fas fa-vial"></i> Probar Configuración de Proxy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="debug-info">
+                            <p><strong>Nota:</strong> Si estás obteniendo errores de CORS en producción, configura un proxy. Para el Banco Unión S.A., se recomienda usar un proxy interno.</p>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="saveProxyConfig">
+                                <i class="fas fa-save"></i> Guardar Configuración de Proxy
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="credentials-tab" class="tab-content">
+                        <div class="content-type-fix">
+                            <h4><i class="fas fa-key"></i> Solución Definitiva para "Invalid credentials"</h4>
+                            
+                            <p>El error <strong>"Invalid credentials" en Producción</strong> significa que estás usando las credenciales de QA/Sandbox en el ambiente de Producción.</p>
+                            
+                            <div class="warning-box">
+                                <h5><i class="fas fa-exclamation-triangle"></i> ¡VERIFICA ESTO PRIMERO!</h5>
+                                <p><strong>PayU SIEMPRE tiene credenciales separadas para QA y Producción.</strong></p>
+                                <p>Si alguien te dijo que son las mismas, está <strong>INCORRECTO</strong>.</p>
+                            </div>
+                            
+                            <div class="solution-steps">
+                                <h5><i class="fas fa-list-ol"></i> Pasos para Obtener Credenciales Correctas:</h5>
+                                <ol>
+                                    <li><strong>Accede al dashboard de Producción:</strong>
+                                        <ul style="margin-top: 5px; margin-bottom: 10px;">
+                                            <li>URL: <a href="https://dashboard.payulatam.com/" target="_blank">https://dashboard.payulatam.com/</a></li>
+                                            <li>Inicia sesión con tus credenciales de Producción</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Obtén las credenciales API de Producción:</strong>
+                                        <ul style="margin-top: 5px; margin-bottom: 10px;">
+                                            <li>Ve a <strong>Configuración → API Keys</strong></li>
+                                            <li>Busca las credenciales marcadas como <strong>"Producción"</strong></li>
+                                            <li>Copia el <strong>API Login</strong> y <strong>API Key</strong></li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Configúralas en este sistema:</strong>
+                                        <ul style="margin-top: 5px; margin-bottom: 10px;">
+                                            <li>En la pestaña "Configuración"</li>
+                                            <li>En los campos <strong>"API Login (Producción)"</strong> y <strong>"API Key (Producción)"</strong></li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Prueba nuevamente:</strong>
+                                        <ul style="margin-top: 5px; margin-bottom: 10px;">
+                                            <li>Usa el botón "Probar Conexión Actual"</li>
+                                            <li>O "Probar Ambos Ambientes" para verificar ambos</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </div>
+                            
+                            <div class="debug-info">
+                                <h5><i class="fas fa-lightbulb"></i> ¿Por qué pasa esto?</h5>
+                                <ul style="padding-left: 20px;">
+                                    <li>PayU genera credenciales <strong>ÚNICAS</strong> para cada ambiente</li>
+                                    <li>Las credenciales de QA/Sandbox <strong>NO FUNCIONAN</strong> en Producción</li>
+                                    <li>Las credenciales de Producción <strong>NO FUNCIONAN</strong> en QA</li>
+                                    <li>Son sistemas <strong>COMPLETAMENTE SEPARADOS</strong></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="api-response-example">
+// Esto es lo que recibes actualmente:
+{
+  "code": "ERROR",
+  "error": "Invalid credentials",
+  "result": null
+}
+
+// Esto es lo que deberías recibir con credenciales correctas:
+{
+  "code": "SUCCESS",
+  "error": null,
+  "result": {
+    "payload": "ping"
+  }
+}
+
+// Estructura CORRECTA del request para PING:
+{
+  "test": false,  // false para Producción, true para QA
+  "language": "en",
+  "command": "PING",
+  "merchant": {
+    "apiLogin": "TU_API_LOGIN_PRODUCCION",  // DIFERENTE al de QA
+    "apiKey": "TU_API_KEY_PRODUCCION"       // DIFERENTE al de QA
+  }
+}
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-success" id="applyCredentialsFix">
+                                <i class="fas fa-external-link-alt"></i> Abrir Dashboard de Producción
+                            </button>
+                            <button class="btn btn-info" id="copyTestCredentials">
+                                <i class="far fa-copy"></i> Copiar Estructura de Prueba
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-search"></i> Consultas Disponibles</h2>
+                    
+                    <div class="query-types">
+                        <div class="query-type-btn active" data-command="ORDER_DETAIL">
+                            <i class="fas fa-file-invoice"></i>
+                            <div>Por Order ID</div>
+                        </div>
+                        
+                        <div class="query-type-btn" data-command="TRANSACTION_RESPONSE_DETAIL">
+                            <i class="fas fa-exchange-alt"></i>
+                            <div>Por Transaction ID</div>
+                        </div>
+                        
+                        <div class="query-type-btn" data-command="ORDER_DETAIL_BY_REFERENCE_CODE">
+                            <i class="fas fa-barcode"></i>
+                            <div>Por Reference ID</div>
+                        </div>
+                        
+                        <div class="query-type-btn" data-command="PING">
+                            <i class="fas fa-network-wired"></i>
+                            <div>Ping (Conexión)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="queryParam">Parámetro de Consulta</label>
+                        <input type="text" id="queryParam" placeholder="Ej: 857695047 (Order ID)">
+                        <small id="queryHelp" class="form-text" style="color: #7f8c8d; font-size: 0.9rem;">Ingrese el identificador correspondiente según el tipo de consulta seleccionado</small>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="executeQuery">
+                            <i class="fas fa-play"></i> Ejecutar Consulta
+                        </button>
+                        <button class="btn btn-warning" id="clearQuery">
+                            <i class="fas fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
+                    
+                    <div class="loading" id="queryLoading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Ejecutando consulta en PAYU...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="card response-container">
+                    <h2 class="card-title"><i class="fas fa-file-code"></i> Respuesta del API</h2>
+                    
+                    <button class="copy-btn" id="copyResponse">
+                        <i class="far fa-copy"></i> Copiar Respuesta
+                    </button>
+                    
+                    <div id="responseOutput">
+// Aquí se mostrará la respuesta del API
+// Seleccione un tipo de consulta e ingrese los parámetros necesarios
+
+Ejemplo de respuesta exitosa:
+
+{
+  "code": "SUCCESS",
+  "error": null,
+  "result": {
+    "payload": {
+      "id": 857695047,
+      "status": "CAPTURED",
+      "referenceCode": "PRODUCT_TEST_2021-05-03T18:01:10.946Z"
+    }
+  }
+}
+
+Ejemplo de error de credenciales en Producción:
+
+{
+  "code": "ERROR",
+  "error": "Invalid credentials",
+  "result": null
+}
+
+NOTA: "Invalid credentials" en Producción significa que
+estás usando credenciales de QA en Producción.
+¡Necesitas credenciales diferentes!
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-info-circle"></i> Información del Sistema</h2>
+                    
+                    <div class="info-item">
+                        <div class="info-label">URL del API:</div>
+                        <div class="info-value" id="apiUrl">https://sandbox.api.payulatam.com/reports-api/4.0/service.cgi</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Versión del API:</div>
+                        <div class="info-value">4.0</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Método de solicitud:</div>
+                        <div class="info-value">POST</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Formato de datos:</div>
+                        <div class="info-value">JSON</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Última conexión exitosa:</div>
+                        <div class="info-value" id="lastConnection">Nunca</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Proxy activo:</div>
+                        <div class="info-value"><span id="proxyActiveStatus" class="proxy-status inactive">No</span></div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Credenciales QA configuradas:</div>
+                        <div class="info-value"><span id="qaCredentialsStatus" class="proxy-status inactive">No</span></div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Credenciales Prod configuradas:</div>
+                        <div class="info-value"><span id="prodCredentialsStatus" class="proxy-status inactive">No</span></div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-danger" id="clearAllData">
+                            <i class="fas fa-trash-alt"></i> Limpiar Datos Guardados
+                        </button>
+                        <button class="btn btn-info" id="showDebugInfo">
+                            <i class="fas fa-bug"></i> Ver Configuración
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <img src="LOGO.png" alt="Banco Unión S.A." class="footer-logo">
+            <p><strong>Banco Unión S.A.</strong> - Sistema de Conexión API PAYU | Versión 1.3</p>
+            <p>Documentación oficial: <a href="https://developers.payulatam.com/latam/es/docs/integrations/api-integration/queries-api.html" target="_blank">PayU API Documentation</a></p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #95a5a6;">© 2025 Banco Unión S.A. - Todos los derechos reservados</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Variables globales - CREDENCIALES SEPARADAS
+        let config = {
+            // Credenciales de API SEPARADAS por ambiente
+            apiLoginQA: '',
+            apiKeyQA: '',
+            apiLoginProd: '',
+            apiKeyProd: '',
+            
+            // Configuración de comercio por ambiente
+            merchantIdQA: '',
+            accountIdQA: '',
+            merchantIdProd: '',
+            accountIdProd: '',
+            
+            environment: 'qa',
+            lastConnection: null,
+            proxyEnabled: false,
+            proxyUrl: '',
+            proxyTimeout: 30,
+            logRequests: false,
+            lastError: null
+        };
+        
+        // URLs del API según el ambiente
+        const API_URLS = {
+            qa: 'https://sandbox.api.payulatam.com/reports-api/4.0/service.cgi',
+            production: 'https://api.payulatam.com/reports-api/4.0/service.cgi'
+        };
+        
+        // Dashboards de PayU
+        const PAYU_DASHBOARDS = {
+            qa: 'https://sandbox.dashboard.payulatam.com/',
+            production: 'https://dashboard.payulatam.com/'
+        };
+        
+        // Cargar configuración al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            setupEventListeners();
+            updateUIFromConfig();
+        });
+        
+        // Cargar configuración desde localStorage
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('payuApiConfig');
+            if (savedConfig) {
+                config = JSON.parse(savedConfig);
+            }
+        }
+        
+        // Guardar configuración en localStorage
+        function saveConfig() {
+            localStorage.setItem('payuApiConfig', JSON.stringify(config));
+        }
+        
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Guardar configuración
+            document.getElementById('saveConfig').addEventListener('click', saveConfiguration);
+            
+            // Mostrar/Ocultar API Keys
+            document.getElementById('showApiKeyQA').addEventListener('change', function() {
+                const apiKeyInput = document.getElementById('apiKeyQA');
+                apiKeyInput.type = this.checked ? 'text' : 'password';
+            });
+            
+            document.getElementById('showApiKeyProd').addEventListener('change', function() {
+                const apiKeyInput = document.getElementById('apiKeyProd');
+                apiKeyInput.type = this.checked ? 'text' : 'password';
+            });
+            
+            document.getElementById('showTestApiKey').addEventListener('change', function() {
+                const apiKeyInput = document.getElementById('testApiKey');
+                apiKeyInput.type = this.checked ? 'text' : 'password';
+            });
+            
+            // Cambiar ambiente
+            document.getElementById('environment').addEventListener('change', updateEnvironment);
+            
+            // Probar conexión
+            document.getElementById('testConnection').addEventListener('click', testConnection);
+            
+            // Probar ambos ambientes
+            document.getElementById('testBothEnvironments').addEventListener('click', testBothEnvironments);
+            
+            // Probar credenciales específicas
+            document.getElementById('testSpecificCredentials').addEventListener('click', testSpecificCredentials);
+            
+            // Cambiar tipo de consulta
+            document.querySelectorAll('.query-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.query-type-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateQueryHelp();
+                });
+            });
+            
+            // Ejecutar consulta
+            document.getElementById('executeQuery').addEventListener('click', executeQuery);
+            
+            // Limpiar consulta
+            document.getElementById('clearQuery').addEventListener('click', clearQuery);
+            
+            // Copiar respuesta
+            document.getElementById('copyResponse').addEventListener('click', copyResponse);
+            
+            // Limpiar todos los datos
+            document.getElementById('clearAllData').addEventListener('click', clearAllData);
+            
+            // Mostrar info debug
+            document.getElementById('showDebugInfo').addEventListener('click', showDebugInfo);
+            
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Configuración de Proxy
+            document.getElementById('enableProxy').addEventListener('change', function() {
+                const proxySettings = document.getElementById('proxySettings');
+                const proxyStatusText = document.getElementById('proxyStatusText');
+                
+                if (this.checked) {
+                    proxySettings.style.display = 'block';
+                    proxyStatusText.textContent = 'Proxy habilitado';
+                } else {
+                    proxySettings.style.display = 'none';
+                    proxyStatusText.textContent = 'Proxy deshabilitado';
+                }
+            });
+            
+            // Guardar configuración de proxy
+            document.getElementById('saveProxyConfig').addEventListener('click', saveProxyConfiguration);
+            
+            // Probar proxy
+            document.getElementById('testProxy').addEventListener('click', testProxyConfiguration);
+            
+            // Abrir dashboard de producción
+            document.getElementById('applyCredentialsFix').addEventListener('click', function() {
+                window.open(PAYU_DASHBOARDS.production, '_blank');
+                showNotification('Abriendo dashboard de Producción de PayU...', 'info');
+            });
+            
+            // Copiar estructura de prueba
+            document.getElementById('copyTestCredentials').addEventListener('click', function() {
+                const testStructure = `{
+  "test": false,
+  "language": "en",
+  "command": "PING",
+  "merchant": {
+    "apiLogin": "TU_API_LOGIN_PRODUCCION",
+    "apiKey": "TU_API_KEY_PRODUCCION"
+  }
+}`;
+                
+                navigator.clipboard.writeText(testStructure)
+                    .then(() => {
+                        showNotification('Estructura de prueba copiada al portapapeles', 'success');
+                    })
+                    .catch(err => {
+                        showNotification('Error al copiar: ' + err, 'error');
+                    });
+            });
+        }
+        
+        // Actualizar UI según configuración
+        function updateUIFromConfig() {
+            // Credenciales de API SEPARADAS
+            document.getElementById('apiLoginQA').value = config.apiLoginQA || '';
+            document.getElementById('apiKeyQA').value = config.apiKeyQA || '';
+            document.getElementById('apiLoginProd').value = config.apiLoginProd || '';
+            document.getElementById('apiKeyProd').value = config.apiKeyProd || '';
+            
+            // Configuración de comercio por ambiente
+            document.getElementById('merchantIdQA').value = config.merchantIdQA || '';
+            document.getElementById('accountIdQA').value = config.accountIdQA || '';
+            document.getElementById('merchantIdProd').value = config.merchantIdProd || '';
+            document.getElementById('accountIdProd').value = config.accountIdProd || '';
+            
+            document.getElementById('environment').value = config.environment || 'qa';
+            
+            // Configuración de proxy
+            document.getElementById('enableProxy').checked = config.proxyEnabled || false;
+            document.getElementById('proxyUrl').value = config.proxyUrl || '';
+            document.getElementById('proxyTimeout').value = config.proxyTimeout || 30;
+            document.getElementById('logRequests').checked = config.logRequests || false;
+            
+            // Actualizar UI de proxy
+            const proxySettings = document.getElementById('proxySettings');
+            const proxyStatusText = document.getElementById('proxyStatusText');
+            const proxyActiveStatus = document.getElementById('proxyActiveStatus');
+            
+            if (config.proxyEnabled) {
+                proxySettings.style.display = 'block';
+                proxyStatusText.textContent = 'Proxy habilitado';
+                proxyActiveStatus.textContent = 'Sí';
+                proxyActiveStatus.className = 'proxy-status active';
+            } else {
+                proxySettings.style.display = 'none';
+                proxyStatusText.textContent = 'Proxy deshabilitado';
+                proxyActiveStatus.textContent = 'No';
+                proxyActiveStatus.className = 'proxy-status inactive';
+            }
+            
+            // Actualizar estado de credenciales
+            const qaCredentialsStatus = document.getElementById('qaCredentialsStatus');
+            const prodCredentialsStatus = document.getElementById('prodCredentialsStatus');
+            
+            if (config.apiLoginQA && config.apiKeyQA) {
+                qaCredentialsStatus.textContent = 'Sí';
+                qaCredentialsStatus.className = 'proxy-status active';
+            } else {
+                qaCredentialsStatus.textContent = 'No';
+                qaCredentialsStatus.className = 'proxy-status inactive';
+            }
+            
+            if (config.apiLoginProd && config.apiKeyProd) {
+                prodCredentialsStatus.textContent = 'Sí';
+                prodCredentialsStatus.className = 'proxy-status active';
+            } else {
+                prodCredentialsStatus.textContent = 'No';
+                prodCredentialsStatus.className = 'proxy-status inactive';
+            }
+            
+            // Actualizar último error
+            if (config.lastError) {
+                document.getElementById('lastError').textContent = config.lastError;
+            }
+            
+            // Actualizar información del sistema
+            updateApiUrl();
+            updateEnvironmentIndicator();
+            
+            // Actualizar última conexión
+            if (config.lastConnection) {
+                const date = new Date(config.lastConnection);
+                document.getElementById('lastConnection').textContent = date.toLocaleString();
+            }
+            
+            // Actualizar ayuda de consulta
+            updateQueryHelp();
+        }
+        
+        // Obtener credenciales según el ambiente
+        function getCredentialsForEnvironment(env) {
+            if (env === 'qa') {
+                return {
+                    apiLogin: config.apiLoginQA,
+                    apiKey: config.apiKeyQA,
+                    merchantId: config.merchantIdQA,
+                    accountId: config.accountIdQA
+                };
+            } else {
+                return {
+                    apiLogin: config.apiLoginProd,
+                    apiKey: config.apiKeyProd,
+                    merchantId: config.merchantIdProd,
+                    accountId: config.accountIdProd
+                };
+            }
+        }
+        
+        // Actualizar URL del API según el ambiente
+        function updateApiUrl() {
+            const url = API_URLS[config.environment];
+            document.getElementById('apiUrl').textContent = url;
+        }
+        
+        // Actualizar indicador de ambiente
+        function updateEnvironmentIndicator() {
+            const indicator = document.getElementById('environmentIndicator');
+            if (config.environment === 'production') {
+                indicator.textContent = 'PRODUCCIÓN';
+                indicator.classList.add('production');
+            } else {
+                indicator.textContent = 'QA / PRUEBAS';
+                indicator.classList.remove('production');
+            }
+        }
+        
+        // Actualizar ayuda según tipo de consulta
+        function updateQueryHelp() {
+            const activeQuery = document.querySelector('.query-type-btn.active');
+            const command = activeQuery.getAttribute('data-command');
+            const helpText = document.getElementById('queryHelp');
+            const input = document.getElementById('queryParam');
+            
+            switch(command) {
+                case 'ORDER_DETAIL':
+                    helpText.textContent = 'Ingrese el Order ID generado por PayU (ej: 857695047)';
+                    input.placeholder = 'Ej: 857695047 (Order ID)';
+                    break;
+                case 'TRANSACTION_RESPONSE_DETAIL':
+                    helpText.textContent = 'Ingrese el Transaction ID generado por PayU (ej: 5fde3c2c-540d-4579-96f7-2a4b8c65a951)';
+                    input.placeholder = 'Ej: 5fde3c2c-540d-4579-96f7-2a4b8c65a951 (Transaction ID)';
+                    break;
+                case 'ORDER_DETAIL_BY_REFERENCE_CODE':
+                    helpText.textContent = 'Ingrese el Reference Code generado por su comercio (ej: HP14015317573744)';
+                    input.placeholder = 'Ej: HP14015317573744 (Reference Code)';
+                    break;
+                case 'PING':
+                    helpText.textContent = 'No se requiere parámetro para la prueba de conexión Ping';
+                    input.placeholder = 'No se requiere parámetro para Ping';
+                    input.value = '';
+                    break;
+            }
+        }
+        
+        // Guardar configuración
+        function saveConfiguration() {
+            // Credenciales de API SEPARADAS
+            config.apiLoginQA = document.getElementById('apiLoginQA').value.trim();
+            config.apiKeyQA = document.getElementById('apiKeyQA').value.trim();
+            config.apiLoginProd = document.getElementById('apiLoginProd').value.trim();
+            config.apiKeyProd = document.getElementById('apiKeyProd').value.trim();
+            
+            // Configuración de comercio por ambiente
+            config.merchantIdQA = document.getElementById('merchantIdQA').value.trim();
+            config.accountIdQA = document.getElementById('accountIdQA').value.trim();
+            config.merchantIdProd = document.getElementById('merchantIdProd').value.trim();
+            config.accountIdProd = document.getElementById('accountIdProd').value.trim();
+            
+            // Validar campos requeridos por ambiente
+            const env = document.getElementById('environment').value;
+            
+            if (env === 'qa') {
+                if (!config.apiLoginQA || !config.apiKeyQA) {
+                    showNotification('Para el ambiente QA, debe configurar las credenciales de QA', 'error');
+                    return;
+                }
+            } else {
+                if (!config.apiLoginProd || !config.apiKeyProd) {
+                    showNotification('Para el ambiente Producción, debe configurar las credenciales de Producción', 'error');
+                    return;
+                }
+            }
+            
+            saveConfig();
+            updateUIFromConfig();
+            showNotification('Configuración guardada exitosamente', 'success');
+        }
+        
+        // Guardar configuración de proxy
+        function saveProxyConfiguration() {
+            config.proxyEnabled = document.getElementById('enableProxy').checked;
+            config.proxyUrl = document.getElementById('proxyUrl').value.trim();
+            config.proxyTimeout = parseInt(document.getElementById('proxyTimeout').value) || 30;
+            config.logRequests = document.getElementById('logRequests').checked;
+            
+            saveConfig();
+            updateUIFromConfig();
+            showNotification('Configuración de proxy guardada', 'success');
+        }
+        
+        // Probar configuración de proxy
+        function testProxyConfiguration() {
+            const testUrl = 'https://httpbin.org/get';
+            const proxyUrl = getProxyUrl(testUrl);
+            
+            showNotification('Probando configuración de proxy...', 'info');
+            
+            fetch(proxyUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    showNotification('Proxy configurado correctamente', 'success');
+                } else {
+                    showNotification('Proxy respondió con error: ' + response.status, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error al conectar con el proxy: ' + error.message, 'error');
+            });
+        }
+        
+        // Obtener URL con proxy si está habilitado
+        function getProxyUrl(targetUrl) {
+            if (!config.proxyEnabled) {
+                return targetUrl;
+            }
+            
+            // Si se especificó una URL de proxy personalizada
+            if (config.proxyUrl) {
+                return config.proxyUrl + '?url=' + encodeURIComponent(targetUrl);
+            }
+            
+            // Por defecto, usar un servicio proxy público confiable
+            return 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+        }
+        
+        // Cambiar ambiente
+        function updateEnvironment() {
+            config.environment = document.getElementById('environment').value;
+            saveConfig();
+            updateApiUrl();
+            updateEnvironmentIndicator();
+            
+            const envName = config.environment === 'production' ? 'PRODUCCIÓN' : 'QA/PRUEBAS';
+            showNotification(`Ambiente actualizado a ${envName}`, 'info');
+            
+            // Mostrar advertencia si no hay credenciales para el ambiente actual
+            const credentials = getCredentialsForEnvironment(config.environment);
+            if (!credentials.apiLogin || !credentials.apiKey) {
+                showNotification(`Advertencia: No hay credenciales configuradas para ${envName}`, 'warning');
+            }
+        }
+        
+        // Probar conexión
+        async function testConnection() {
+            const env = config.environment;
+            const credentials = getCredentialsForEnvironment(env);
+            
+            if (!credentials.apiLogin || !credentials.apiKey) {
+                const envName = env === 'qa' ? 'QA' : 'Producción';
+                showNotification(`Por favor, configure las credenciales de API para ${envName}`, 'error');
+                return;
+            }
+            
+            await testConnectionWithCredentials(env, credentials.apiLogin, credentials.apiKey, credentials.merchantId, credentials.accountId);
+        }
+        
+        // Probar ambos ambientes
+        async function testBothEnvironments() {
+            const qaCredentials = getCredentialsForEnvironment('qa');
+            const prodCredentials = getCredentialsForEnvironment('production');
+            
+            let testedAny = false;
+            
+            // Probar QA si hay credenciales
+            if (qaCredentials.apiLogin && qaCredentials.apiKey) {
+                await testConnectionWithCredentials('qa', qaCredentials.apiLogin, qaCredentials.apiKey, qaCredentials.merchantId, qaCredentials.accountId);
+                testedAny = true;
+                
+                // Esperar 1 segundo antes de probar producción
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            } else {
+                showNotification('No hay credenciales configuradas para QA', 'warning');
+            }
+            
+            // Probar producción si hay credenciales
+            if (prodCredentials.apiLogin && prodCredentials.apiKey) {
+                await testConnectionWithCredentials('production', prodCredentials.apiLogin, prodCredentials.apiKey, prodCredentials.merchantId, prodCredentials.accountId);
+                testedAny = true;
+            } else {
+                showNotification('No hay credenciales configuradas para Producción', 'warning');
+            }
+            
+            if (!testedAny) {
+                showNotification('No hay credenciales configuradas para probar ningún ambiente', 'error');
+            }
+        }
+        
+        // Probar credenciales específicas
+        async function testSpecificCredentials() {
+            const env = document.getElementById('testEnvironment').value;
+            const apiLogin = document.getElementById('testApiLogin').value.trim();
+            const apiKey = document.getElementById('testApiKey').value.trim();
+            const merchantId = document.getElementById('testMerchantId').value.trim();
+            const accountId = document.getElementById('testAccountId').value.trim();
+            
+            if (!apiLogin || !apiKey) {
+                showNotification('Por favor, ingrese API Login y API Key para probar', 'error');
+                return;
+            }
+            
+            await testConnectionWithCredentials(env, apiLogin, apiKey, merchantId, accountId);
+        }
+        
+        // Función principal para probar conexión
+        async function testConnectionWithCredentials(env, apiLogin, apiKey, merchantId, accountId) {
+            // Actualizar información de prueba
+            document.getElementById('testedEnvironment').textContent = env === 'qa' ? 'QA/Pruebas' : 'Producción';
+            
+            // Mostrar loading
+            document.getElementById('connectionLoading').style.display = 'block';
+            document.getElementById('loadingMessage').textContent = `Probando conexión con PAYU (${env === 'qa' ? 'QA' : 'Producción'})...`;
+            document.getElementById('testConnection').disabled = true;
+            document.getElementById('testBothEnvironments').disabled = true;
+            document.getElementById('testSpecificCredentials').disabled = true;
+            
+            // Estructura SIMPLE para PING - PayU solo necesita apiLogin y apiKey para PING
+            const requestData = {
+                test: env === 'qa',
+                language: "en",
+                command: "PING",
+                merchant: {
+                    apiLogin: apiLogin,
+                    apiKey: apiKey
+                }
+            };
+            
+            console.log(`Enviando a PayU (${env}):`, JSON.stringify(requestData, null, 2));
+            
+            try {
+                const response = await makeApiRequest(requestData, env);
+                
+                // Actualizar estado de conexión
+                const statusElement = document.getElementById('connectionStatus');
+                if (response.code === 'SUCCESS') {
+                    statusElement.innerHTML = `<span class="status-indicator status-connected"></span> Conectado (${env === 'qa' ? 'QA' : 'Prod'})`;
+                    
+                    const envName = env === 'qa' ? 'QA' : 'Producción';
+                    showNotification(`¡Conexión exitosa con PAYU ${envName}!`, 'success');
+                    
+                    // Actualizar última conexión
+                    config.lastConnection = new Date().toISOString();
+                    config.lastError = null;
+                    saveConfig();
+                    document.getElementById('lastConnection').textContent = new Date().toLocaleString();
+                    document.getElementById('lastError').textContent = 'Ninguno';
+                } else {
+                    statusElement.innerHTML = `<span class="status-indicator status-disconnected"></span> Error (${env === 'qa' ? 'QA' : 'Prod'})`;
+                    
+                    const errorMsg = response.error || 'Desconocido';
+                    const envName = env === 'qa' ? 'QA' : 'Producción';
+                    
+                    // Mensaje especial para Invalid credentials
+                    if (errorMsg.toLowerCase().includes('invalid credential')) {
+                        showNotification(`CREDENCIALES INVÁLIDAS en ${envName}: Necesitas credenciales diferentes para ${envName}`, 'error');
+                    } else {
+                        showNotification(`Error en ${envName}: ${errorMsg}`, 'error');
+                    }
+                    
+                    // Guardar último error
+                    config.lastError = errorMsg;
+                    saveConfig();
+                    document.getElementById('lastError').textContent = errorMsg;
+                }
+                
+                // Mostrar respuesta
+                displayResponse(response);
+            } catch (error) {
+                let errorMessage = error.message;
+                const envName = env === 'qa' ? 'QA' : 'Producción';
+                
+                // Detectar errores específicos
+                if (errorMessage.includes('403')) {
+                    errorMessage = 'Error 403: Acceso denegado. Posible problema de CORS o proxy.';
+                } else if (errorMessage.includes('401') || errorMessage.includes('Invalid credentials')) {
+                    errorMessage = `CREDENCIALES INVÁLIDAS para ${envName}. ¡Necesitas credenciales diferentes!`;
+                } else if (errorMessage.includes('formato') || errorMessage.includes('format')) {
+                    errorMessage = 'Formato de petición inválido. Contacta a soporte de PayU.';
+                }
+                
+                showNotification(`Error en ${envName}: ${errorMessage}`, 'error');
+                document.getElementById('connectionStatus').innerHTML = `<span class="status-indicator status-disconnected"></span> Error (${env === 'qa' ? 'QA' : 'Prod'})`;
+                
+                // Guardar último error
+                config.lastError = errorMessage;
+                saveConfig();
+                document.getElementById('lastError').textContent = errorMessage;
+                
+                displayResponse({ 
+                    error: errorMessage, 
+                    code: 'ERROR', 
+                    timestamp: new Date().toISOString(),
+                    environment: env,
+                    requestData: requestData,
+                    note: env === 'production' ? 
+                        'Para Producción necesitas credenciales DIFERENTES a las de QA.' :
+                        'Para QA necesitas credenciales DIFERENTES a las de Producción.'
+                });
+            } finally {
+                document.getElementById('connectionLoading').style.display = 'none';
+                document.getElementById('testConnection').disabled = false;
+                document.getElementById('testBothEnvironments').disabled = false;
+                document.getElementById('testSpecificCredentials').disabled = false;
+            }
+        }
+        
+        // Ejecutar consulta
+        async function executeQuery() {
+            const env = config.environment;
+            const credentials = getCredentialsForEnvironment(env);
+            
+            if (!credentials.apiLogin || !credentials.apiKey) {
+                const envName = env === 'qa' ? 'QA' : 'Producción';
+                showNotification(`Por favor, configure las credenciales de API para ${envName}`, 'error');
+                return;
+            }
+            
+            const activeQuery = document.querySelector('.query-type-btn.active');
+            const command = activeQuery.getAttribute('data-command');
+            const queryParam = document.getElementById('queryParam').value.trim();
+            
+            // Validar parámetros según el tipo de consulta
+            if (command !== 'PING' && !queryParam) {
+                showNotification('Por favor, ingrese el parámetro requerido para la consulta', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('queryLoading').style.display = 'block';
+            document.getElementById('executeQuery').disabled = true;
+            
+            // Preparar solicitud base
+            let requestData = {
+                test: env === 'qa',
+                language: "en",
+                command: command,
+                merchant: {
+                    apiLogin: credentials.apiLogin,
+                    apiKey: credentials.apiKey
+                }
+            };
+            
+            // Para consultas que no son PING, agregar merchantId
+            if (command !== 'PING' && credentials.merchantId) {
+                requestData.merchant.merchantId = credentials.merchantId.toString();
+                
+                // Agregar accountId si está presente
+                if (credentials.accountId && credentials.accountId.trim() !== '') {
+                    requestData.merchant.accountId = credentials.accountId.toString();
+                }
+            }
+            
+            // Agregar detalles según el tipo de consulta
+            if (command !== 'PING') {
+                requestData.details = {};
+                
+                switch(command) {
+                    case 'ORDER_DETAIL':
+                        const orderId = parseInt(queryParam);
+                        if (isNaN(orderId)) {
+                            showNotification('Order ID debe ser un número válido', 'error');
+                            document.getElementById('queryLoading').style.display = 'none';
+                            document.getElementById('executeQuery').disabled = false;
+                            return;
+                        }
+                        requestData.details.orderId = orderId;
+                        break;
+                    case 'TRANSACTION_RESPONSE_DETAIL':
+                        requestData.details.transactionId = queryParam;
+                        break;
+                    case 'ORDER_DETAIL_BY_REFERENCE_CODE':
+                        requestData.details.referenceCode = queryParam;
+                        break;
+                }
+            }
+            
+            console.log(`Ejecutando consulta (${env}):`, JSON.stringify(requestData, null, 2));
+            
+            try {
+                const response = await makeApiRequest(requestData, env);
+                
+                // Actualizar última conexión
+                if (response.code === 'SUCCESS') {
+                    config.lastConnection = new Date().toISOString();
+                    config.lastError = null;
+                    saveConfig();
+                    document.getElementById('lastConnection').textContent = new Date().toLocaleString();
+                    document.getElementById('lastError').textContent = 'Ninguno';
+                } else {
+                    config.lastError = response.error || 'Error desconocido';
+                    saveConfig();
+                    document.getElementById('lastError').textContent = config.lastError;
+                }
+                
+                // Mostrar respuesta
+                displayResponse(response);
+                
+                // Mostrar notificación de éxito
+                if (response.code === 'SUCCESS') {
+                    showNotification(`Consulta ejecutada exitosamente en ${env === 'qa' ? 'QA' : 'Producción'}`, 'success');
+                } else {
+                    showNotification(`Consulta completada con errores: ${response.error || 'Desconocido'}`, 'error');
+                }
+            } catch (error) {
+                let errorMessage = error.message;
+                showNotification(`Error en la consulta: ${errorMessage}`, 'error');
+                displayResponse({ 
+                    error: error.message, 
+                    code: 'ERROR', 
+                    timestamp: new Date().toISOString(),
+                    environment: env,
+                    requestData: requestData
+                });
+                
+                // Guardar último error
+                config.lastError = errorMessage;
+                saveConfig();
+                document.getElementById('lastError').textContent = errorMessage;
+            } finally {
+                document.getElementById('queryLoading').style.display = 'none';
+                document.getElementById('executeQuery').disabled = false;
+            }
+        }
+        
+        // Hacer solicitud al API
+        async function makeApiRequest(requestData, env) {
+            let url = API_URLS[env];
+            
+            // Aplicar proxy si está habilitado
+            if (config.proxyEnabled) {
+                url = getProxyUrl(url);
+            }
+            
+            // Log de la petición si está habilitado
+            if (config.logRequests) {
+                console.log(`[${env.toUpperCase()}] Realizando petición a:`, url);
+                console.log(`[${env.toUpperCase()}] Datos de la petición:`, JSON.stringify(requestData, null, 2));
+            }
+            
+            try {
+                // Configurar timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), (config.proxyTimeout || 30) * 1000);
+                
+                // Headers con Content-Type fijo
+                const headers = {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Accept': 'application/json'
+                };
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(requestData),
+                    signal: controller.signal,
+                    mode: 'cors'
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    
+                    // Intentar parsear como JSON
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        if (errorJson.error) {
+                            throw new Error(errorJson.error);
+                        }
+                    } catch (e) {
+                        // Si no es JSON, usar el texto plano
+                    }
+                    
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}. Detalles: ${errorText.substring(0, 200)}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw new Error(`Timeout: La solicitud excedió el tiempo límite de ${config.proxyTimeout || 30} segundos`);
+                }
+                
+                // Mejorar mensaje de error para credenciales inválidas
+                if (error.message.includes('Invalid credentials') || 
+                    error.message.includes('401') || 
+                    error.message.toLowerCase().includes('unauthorized')) {
+                    throw new Error('Invalid credentials - Credenciales inválidas para este ambiente');
+                }
+                
+                throw new Error(`Error de conexión: ${error.message}`);
+            }
+        }
+        
+        // Mostrar respuesta en el panel
+        function displayResponse(data) {
+            const output = document.getElementById('responseOutput');
+            const formattedJson = JSON.stringify(data, null, 2);
+            
+            // Aplicar resaltado de sintaxis básico
+            output.innerHTML = formattedJson
+                .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, 
+                function(match) {
+                    let cls = 'number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'key';
+                        } else {
+                            cls = 'string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'null';
+                    }
+                    return '<span class="' + cls + '">' + match + '</span>';
+                });
+        }
+        
+        // Limpiar consulta
+        function clearQuery() {
+            document.getElementById('queryParam').value = '';
+            document.getElementById('responseOutput').textContent = `// Aquí se mostrará la respuesta del API
+// Seleccione un tipo de consulta e ingrese los parámetros necesarios
+
+Ejemplo de respuesta exitosa:
+
+{
+  "code": "SUCCESS",
+  "error": null,
+  "result": {
+    "payload": {
+      "id": 857695047,
+      "status": "CAPTURED",
+      "referenceCode": "PRODUCT_TEST_2021-05-03T18:01:10.946Z"
+    }
+  }
+}
+
+Ejemplo de error de credenciales en Producción:
+
+{
+  "code": "ERROR",
+  "error": "Invalid credentials",
+  "result": null
+}
+
+NOTA: "Invalid credentials" en Producción significa que
+estás usando credenciales de QA en Producción.
+¡Necesitas credenciales diferentes!`;
+        }
+        
+        // Copiar respuesta al portapapeles
+        function copyResponse() {
+            const responseText = document.getElementById('responseOutput').textContent;
+            
+            navigator.clipboard.writeText(responseText)
+                .then(() => {
+                    showNotification('Respuesta copiada al portapapeles', 'success');
+                })
+                .catch(err => {
+                    showNotification('Error al copiar: ' + err, 'error');
+                });
+        }
+        
+        // Mostrar información de debug
+        function showDebugInfo() {
+            const debugInfo = {
+                config: config,
+                currentEnvironment: config.environment,
+                apiUrl: API_URLS[config.environment],
+                credentialsQA: getCredentialsForEnvironment('qa'),
+                credentialsProd: getCredentialsForEnvironment('production'),
+                timestamp: new Date().toISOString(),
+                localStorageData: localStorage.getItem('payuApiConfig'),
+                note: 'PayU SIEMPRE tiene credenciales diferentes para QA y Producción.'
+            };
+            
+            displayResponse(debugInfo);
+            showNotification('Información de configuración mostrada', 'info');
+        }
+        
+        // Limpiar todos los datos
+        function clearAllData() {
+            if (confirm('¿Está seguro de que desea eliminar toda la configuración y datos guardados?\n\nEsta acción no se puede deshacer.')) {
+                localStorage.removeItem('payuApiConfig');
+                config = {
+                    apiLoginQA: '',
+                    apiKeyQA: '',
+                    apiLoginProd: '',
+                    apiKeyProd: '',
+                    merchantIdQA: '',
+                    accountIdQA: '',
+                    merchantIdProd: '',
+                    accountIdProd: '',
+                    environment: 'qa',
+                    lastConnection: null,
+                    proxyEnabled: false,
+                    proxyUrl: '',
+                    proxyTimeout: 30,
+                    logRequests: false,
+                    lastError: null
+                };
+                
+                updateUIFromConfig();
+                clearQuery();
+                showNotification('Todos los datos han sido eliminados', 'info');
+                
+                // Restablecer checkboxes de mostrar API Key
+                document.getElementById('showApiKeyQA').checked = false;
+                document.getElementById('apiKeyQA').type = 'password';
+                document.getElementById('showApiKeyProd').checked = false;
+                document.getElementById('apiKeyProd').type = 'password';
+                document.getElementById('showTestApiKey').checked = false;
+                document.getElementById('testApiKey').type = 'password';
+            }
+        }
+        
+        // Mostrar notificación
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            
+            // Icono según el tipo
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            notification.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+            notification.className = 'notification ' + type;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
